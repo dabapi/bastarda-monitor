@@ -12,7 +12,7 @@ URL = "https://www.inscripcions.cat/bastarda2026/llistat_inscrits"
 MAX_INSCRITS = 550
 CHECK_INTERVAL = 5
 
-TELEGRAM_TOKEN = "POSA_EL_TOKEN_DEL_BOT"
+TELEGRAM_TOKEN = "8387950556:AAGaG7TU3msb5JZQfc-EO72qzFQ2CWPvH38"
 CHAT_ID = "8039185159"
 
 
@@ -125,8 +125,8 @@ class Handler(BaseHTTPRequestHandler):
 
         <div class="box">
             <p><b>Status:</b> {status}</p>
-            <p><b>Últim número d'inscrits:</b> {last_inscrits}</p>
-            <p><b>Última consulta:</b> {last_check}</p>
+            <p><b>Ultim numero d'inscrits:</b> {last_inscrits}</p>
+            <p><b>Ultima consulta:</b> {last_check}</p>
             <p><b>Interval de consulta:</b> {CHECK_INTERVAL} segons</p>
         </div>
 

@@ -2,7 +2,7 @@ import requests
 import time
 import re
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, UTC
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
@@ -16,9 +16,8 @@ CHAT_ID = "8039185159"
 
 
 def log(msg):
-    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{now}] {msg}", flush=True)
-
 
 def enviar_telegram(msg):
 

@@ -57,6 +57,8 @@ def monitor():
 
     anterior = None
 
+    enviar_telegram("Inici monitor Bastarda")
+    
     while True:
 
         try:

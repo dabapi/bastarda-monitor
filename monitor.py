@@ -3,6 +3,8 @@ import time
 import re
 from bs4 import BeautifulSoup
 from datetime import datetime
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
 URL = "https://www.inscripcions.cat/bastarda2026/llistat_inscrits"
 
@@ -14,8 +16,8 @@ CHAT_ID = "8039185159"
 
 
 def log(msg):
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"[{now}] {msg}")
+    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{now}] {msg}", flush=True)
 
 
 def enviar_telegram(msg):
@@ -49,32 +51,48 @@ def obtenir_inscrits():
     raise Exception("No s'ha trobat el número d'inscrits")
 
 
-log("Monitor iniciat")
+def monitor():
 
-anterior = None
+    log("Monitor iniciat")
 
-while True:
+    anterior = None
 
-    try:
+    while True:
 
-        inscrits = obtenir_inscrits()
+        try:
 
-        log(f"Inscrits actuals: {inscrits}")
+            inscrits = obtenir_inscrits()
 
-        if anterior is not None:
+            log(f"Inscrits actuals: {inscrits}")
 
-            if anterior >= MAX_INSCRITS and inscrits < MAX_INSCRITS:
+            if anterior is not None:
 
-                log("PLAÇA DETECTADA!")
+                if anterior >= MAX_INSCRITS and inscrits < MAX_INSCRITS:
 
-                enviar_telegram(
-                    f"🚨 PLAÇA DISPONIBLE\nInscrits actuals: {inscrits}\nhttps://www.inscripcions.cat/bastarda2026"
-                )
+                    log("PLAÇA DETECTADA")
 
-        anterior = inscrits
+                    enviar_telegram(
+                        f"🚨 PLAÇA DISPONIBLE\n\nInscrits actuals: {inscrits}\nhttps://www.inscripcions.cat/bastarda2026"
+                    )
 
-    except Exception as e:
+            anterior = inscrits
 
-        log(f"Error: {e}")
+        except Exception as e:
 
-    time.sleep(CHECK_INTERVAL)
+            log(f"Error: {e}")
+
+        time.sleep(CHECK_INTERVAL)
+
+
+class Handler(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Monitor running")
+
+
+threading.Thread(target=monitor, daemon=True).start()
+
+server = HTTPServer(("0.0.0.0", 10000), Handler)
+server.serve_forever()

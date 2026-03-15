@@ -1,18 +1,18 @@
 import requests
 import time
 import re
+import threading
 from bs4 import BeautifulSoup
 from datetime import datetime, UTC
-import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 
 URL = "https://www.inscripcions.cat/bastarda2026/llistat_inscrits"
 
 MAX_INSCRITS = 550
-CHECK_INTERVAL = 10
+CHECK_INTERVAL = 5
 
-TELEGRAM_TOKEN = "8387950556:AAGaG7TU3msb5JZQfc-EO72qzFQ2CWPvH38"
+TELEGRAM_TOKEN = "POSA_EL_TOKEN_DEL_BOT"
 CHAT_ID = "8039185159"
 
 
@@ -115,7 +115,7 @@ class Handler(BaseHTTPRequestHandler):
                     background: #f2f2f2;
                     padding: 20px;
                     border-radius: 10px;
-                    width: 400px;
+                    width: 420px;
                 }}
             </style>
         </head>
@@ -127,7 +127,7 @@ class Handler(BaseHTTPRequestHandler):
             <p><b>Status:</b> {status}</p>
             <p><b>Últim número d'inscrits:</b> {last_inscrits}</p>
             <p><b>Última consulta:</b> {last_check}</p>
-            <p><b>Interval de consulta:</b> {CHECK_INTERVAL} s</p>
+            <p><b>Interval de consulta:</b> {CHECK_INTERVAL} segons</p>
         </div>
 
         </body>
@@ -145,71 +145,10 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
 
-# arrencar monitor en segon pla
+# iniciar monitor en segon pla
 threading.Thread(target=monitor, daemon=True).start()
+
 
 # servidor HTTP per Render
-server = HTTPServer(("0.0.0.0", 10000), Handler)
-server.serve_forever()    headers = {"User-Agent": "Mozilla/5.0"}
-
-    r = requests.get(URL, headers=headers, timeout=10)
-
-    soup = BeautifulSoup(r.text, "html.parser")
-
-    text = soup.get_text()
-
-    match = re.search(r"Total Inscrits:\s*(\d+)", text)
-
-    if match:
-        return int(match.group(1))
-
-    raise Exception("No s'ha trobat el número d'inscrits")
-
-
-def monitor():
-
-    log("Monitor iniciat")
-
-    anterior = None
-
-    enviar_telegram("Inici monitor Bastarda")
-    
-    while True:
-
-        try:
-
-            inscrits = obtenir_inscrits()
-
-            log(f"Inscrits actuals: {inscrits}")
-
-            if anterior is not None:
-
-                if anterior >= MAX_INSCRITS and inscrits < MAX_INSCRITS:
-
-                    log("PLAÇA DETECTADA")
-
-                    enviar_telegram(
-                        f"🚨 PLAÇA DISPONIBLE\n\nInscrits actuals: {inscrits}\nhttps://www.inscripcions.cat/bastarda2026"
-                    )
-
-            anterior = inscrits
-
-        except Exception as e:
-
-            log(f"Error: {e}")
-
-        time.sleep(CHECK_INTERVAL)
-
-
-class Handler(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b"Monitor running")
-
-
-threading.Thread(target=monitor, daemon=True).start()
-
 server = HTTPServer(("0.0.0.0", 10000), Handler)
 server.serve_forever()

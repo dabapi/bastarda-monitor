@@ -64,6 +64,8 @@ def monitor():
 
     log("Monitor iniciat")
 
+    enviar_telegram("Inici monitor inscripcions Bastarda")
+
     anterior = None
     status = "running"
 

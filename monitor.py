@@ -10,7 +10,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 URL = "https://www.inscripcions.cat/bastarda2026/llistat_inscrits"
 
 MAX_INSCRITS = 550
-CHECK_INTERVAL = 30
+CHECK_INTERVAL = 60
 
 TELEGRAM_TOKEN = "8387950556:AAGaG7TU3msb5JZQfc-EO72qzFQ2CWPvH38"
 CHAT_ID = "8039185159"
